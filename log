@@ -1,4 +1,8 @@
 #!/bin/sh
 # Flora Log by LeaskH.com
 
+mvtab() {
+    printf "\e]1;$*\a"
+}
+
 mvtab log && tail -F /var/log/system.log | logrender
