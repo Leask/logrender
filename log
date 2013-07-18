@@ -1,0 +1,4 @@
+#!/bin/sh
+# Flora Log by LeaskH.com
+
+mvtab log && tail -F /var/log/system.log | logrender
