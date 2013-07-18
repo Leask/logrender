@@ -1,0 +1,296 @@
+#!/usr/bin/php
+<?php
+# Flora Log by LeaskH.com
+
+function direct($string) {
+    echo rtrim($string) . "\n";
+}
+
+function external_render($string) {
+    direct(shell_exec($string));
+}
+
+function colorize($string) {
+    $string = escapeshellarg($string);
+    external_render("echo {$string} | grcat conf.log");
+}
+
+function json($string) {
+    $string = escapeshellarg($string);
+    external_render(
+        "echo {$string} | "
+      . 'python -mjson.tool | '
+      . 'pygmentize -f terminal256 -l javascript -O style=native'
+    );
+}
+
+function notify($string) {
+    $string = escapeshellarg($string);
+    shell_exec("/Users/leask/Documents/.flora/notify {$string}");
+}
+
+function say($string) {
+    $string = escapeshellarg($string);
+    shell_exec("say {$string}");
+}
+
+function despatchLog($string) {
+    global $patterns;
+    foreach ($patterns as $pI => $pItems) {
+        foreach ($pItems as $pItem) {
+            if (preg_match($pItem, $string)) {
+                switch ($pI) {
+                    case 'direct':
+                        direct($string);
+                        return;
+                    case '500':
+                        colorize($string);
+                        $strNoti = preg_replace(
+                            '/^.*php.*\[\d*\]: PHP [^:]*:\s*(.*)$/',
+                            '$1', $string
+                        );
+                        notify("PHP: {$strNoti}");
+                        say("You got a bug!");
+                        return;
+                    case 'php-json':
+                        $strReg  = '/^(.*php-cgi.*(POST|RETURN|PROXY): )(.*)$/';
+                        $strMeta = preg_replace($strReg, '$1', $string);
+                        $strJson = preg_replace($strReg, '$3', $string);
+                        colorize($strMeta);
+                        json($strJson);
+                        return;
+                    case 'service':
+                        // @todo
+                        return;
+                    case 'ignore':
+                        return;
+                }
+            }
+        }
+    }
+    colorize($string);
+}
+
+# Config
+$patterns = array(
+    'ignore'   => array(
+        '/\d.*(dylib|CoreFoundation|Web|App|Kit|HIServices|HIToolbox).*0x00007fff/',
+        '/\sentries =>/',
+        '/_NotificationSocketReadCallbackGCD/',
+        '/1PasswordAgent/',
+        '/AddressBookSourceSync/',
+        '/AliWangwang/',
+        '/AppleMobileDeviceHelper.*(AMDeviceConnect|DeviceLinkListener)/',
+        '/auditd/',
+        '/Base URL.*null/',
+        '/bootpd.*service time/',
+        '/Case Insensitive Key/',
+        '/CalendarAgent/',
+        '/CoreDAVHrefItem/',
+        '/coreaudiod.*automatic stack shots because audio IO is/',
+        '/Contacts.*CardDAVPlugin-ERROR/',
+        '/coreservicesd.*SendFlattenedData/',
+        '/CGXSetWindowTransform/',
+        '/com\.apple\.dock\.extra.*Event channel check-in failed/',
+        '/com\.apple\.lookupd/',
+        '/com\.apple\.launchd\.peruser.*com\.macpaw\.CleanMyMac2Helper\.trashWatcher/',
+        '/com\.apple\.Preview\.TrustedBookmarksService/',
+        '/com\.apple\.security/i',
+        '/com\.apple\.ShareKitHelper.*--warning/',
+        '/com\.apple\.quicklook\.satellite.*bootstrap_look_up2 failed with/',
+        '/com\.apple\.backupd-helper/',
+        '/com\.apple\.usbmuxd.*Handle/',
+        '/com\.apple\.usbmuxd.*_(SendAttachNotification|heartbeat_failed)/',
+        '/com\.apple\.mtmd.*handler unblock failed/',
+        '/com\.google\.Keystone\.Daemon/',
+        '/com\.apple\.dock\.extra.*(Bug|bogus)/',
+        '/com\.apple\.imdpersistence\.IMDPersistenceAgent.*_CSBackupServerProxySendMessage/',
+        '/com\.apple\.XType\.FontHelper.*(message received|AutoActivation.*scopes)/',
+        '/com\.apple\.WebKit\.Networking.*CFNetwork SSLHandshake failed/',
+        '/Dock.*no information back from LS about running process/',
+        '/Dock.*CGSSetWindowTransformAtPlacement/',
+        '/Divvy.*CGSNewCIFilterByName/',
+        '/distnoted.*distnote server agent/',
+        '/GoogleSoftwareUpdateDaemon/',
+        '/Keynote.*was already registered with another name/',
+        '/Keynote.*NameKeyHashSet and ObjectHashMap out of sync/',
+        '/Keychain Circle Notification.*rawStatus.*applicants.*peers.*err/',
+        '/Keychain Circle Notification.*Checking validity of.*notes/',
+        '/kernel.*memorystatus_thread/',
+        '/kernel.*cs_invalid_page/',
+        '/kernel.*CO/',
+        '/kernel.*ID/',
+        '/kernel.*nspace-handler-unblock: did not find token/',
+        '/kernel\[0\]: D/',
+        '/kernel.*default pager/',
+        '/kernel.*macx_swap.*SUCCESS/',
+        '/kernel.*nspace-handler-set-snapshot-time/',
+        '/helpd.*Could not find access page in directory/',
+        '/imagent.*\[Warning\]/',
+        '/icbaccountsd.*ICB(Local|Remote)Dictionary/',
+        '/IOAudioStream.*clipIfNecessary/',
+        '/launchd.*com\.apple\./',
+        '/launchd.*com\.andymatuschak\.Sparkle\.download-service/',
+        '/leask.*audit warning/',
+        '/last message repeated [0-9]+ time/',
+        '/Locum.*Connection with distnoted server was invalidated/',
+        '/lsboxd.*\@AE relay/',
+        '/lsboxd.*Not allowing process/',
+        '/login.*_PROCESS/',
+        '/login.*in /',
+        '/librariand/',
+        '/loginwindow/',
+        '/Messages.*(\[Warning\]|ERROR)/',
+        '/mds.*(Invalid|error)/',
+        '/mdworker.*Unable to talk to lsboxd/',
+        '/mdworker.*Date validation error/',
+        '/mdworker.*WARNING Invalid component, discarding/',
+        '/mdworker.*iCal\.mdimporter/',
+        '/MDCrashReportTool.*CrashReportCopierAFC/',
+        '/mDNSResponder.*(Could not write data to clientPID|DNSServiceGetAddrInfo)/',
+        '/mtmd.*(Invalid argument|No such file or directory)/',
+        '/mtmfs.*long message send to mtmd/',
+        '/mstreamd/',
+        '/NotificationCenter.*Connection interrupted/',
+        '/profiled.*Idled\./',
+        '/Performance: Please update this scripting addition/',
+        '/QuickLookUIHelper.*Metadata\.framework.*MDItemRef MDItemCreate/',
+        '/SafariDAVClient.*ApplePushService: APSConnection being used without a delegate queue/',
+        '/securebackupd.*Escrow no longer trusted/',
+        '/System Preferences.*\*\*\* WARNING/',
+        '/Payload as (original|full) URL/',
+        '/Problem Reporter.*\*\*\* WARNING/',
+        '/query.*string.*length.*contents/',
+        '/restricted.*bool.*true/',
+        '/ReportCrash.*Saved crash report for/',
+        '/Reeder.*READABILITY/',
+        '/Reeder.*BAD TOKEN/',
+        '/Reeder.*LOGIN/',
+        '/SafariForWebKitDevelopment.*CGSGetWindowBounds/',
+        '/SafariForWebKitDevelopment.*PScurrentwindowbounds/',
+        '/SafariForWebKitDevelopment.*Error.*setting resolution to/',
+        '/Safari.*CGContextClipToRect/',
+        '/Safari.*\*\*\* WARNING/',
+        '/sandboxd.*deny/',
+        '/ScreenCapture/',
+        '/SogouServices/',
+        '/SystemUIServer/',
+        '/System Preferences.*Unable to open IOHIDSystem/',
+        '/secd.*SOSCoderUnwrap No message to send and not done, are we stuck/',
+        '/usernoted.*Failed to validate application at/',
+        '/UserEventAgent.*mach_port_mod_refs returned error/',
+        '/usbmuxd.*AMDevice/',
+        '/VDCAssistant.*VDCAssistant/',
+        '/WebProcess/',
+        '/WindowServer/',
+        '/XPCErrorDescription string/',
+        '/xpcproxy.*assertion failed.*xpcproxy/',
+        '/Twitter\[.*\]:/', // twitter {
+        '/"Accept-Language" = en;/',
+        '/Authorization = "OAuth oauth_signature=/', // }
+        '/<KS.*:/', // google {
+        '/=KS/',
+        '/>,/',
+        '/<o:/',
+        '/<\?xml version="1\.0" encoding="UTF-8" standalone="yes"\?>/',
+        '/>/',
+        '/};/',
+        '/\)}/',
+        '/\);/',
+        '/^\s\)$/',
+        '/^\s*}$/',
+        '/"com\.google\.GoogleDrive" = {/',
+        '/"com\.google\.Chrome" = {/',
+        '/"\.tools\.google\.com",/',
+        '/"\.www\.google\.com",/',
+        '/"\.corp\.google\.com"/',
+        '/\/update2/',
+        '/<app/',
+        '/app>/',
+        '/\/Applications\/Google Chrome\.app\/Contents\/Info\.plist/',
+        '/ActivesInfo = {/',
+        '/AllowedSubdomains = \(/',
+        '/body=/',
+        '/creationDate=/',
+        '/codebaseURL=/',
+        '/codeSize=/',
+        '/codeHash=/',
+        '/<daystart/',
+        '/daystart>/',
+        '/data=/',
+        '/displayVersion=".*"/',
+        '/EngineVersion = ".*";/',
+        '/gupdate>/',
+        '/<gupdate/',
+        '/IsSystem = 1;/',
+        '/Keystone/',
+        '/LastRollCallPingDate =/',
+        '/LastActivePingDate =/',
+        '/LastActiveDate =/',
+        '/needsadmin = false;/',
+        '/Omaha/i',
+        '/otherProperties={/',
+        '/params={/',
+        '/productID=/',
+        '/productID=/',
+        '/runningFetchers=0/',
+        '/status=200/',
+        '/status = ok;/',
+        '/tickets=/i',
+        '/tag=dev/',
+        '/tag="dev"/',
+        '/UserInitiated = 0;/',
+        '/updatecheck>/',
+        '/url="?https:\/\/tools\.google\.com\/service\/update2"?/',
+        '/version=\d+\.\d+\.\d+\.\d+/', // google }
+        '/(updated|deleted): {\(/', // Mavericks {
+        '/an error occurred saving changes to the persistent store mutated/',
+        '/User Info: {/',
+        '/NSUnderlying(Exception|Error)/',
+        '/transactionNumber: 3/',
+        '/^\s\.$/',
+        '/storeName: UserDictionary/',
+        '/localPeerID: leask~/',
+        '/com\.apple\.InputMethodKit\.UserDictionary.*: Core\s?Data/',
+        '/NSFilePath = /',
+        '/NSSQLiteErrorDomain = 19/',
+        '/Managed Object Context Changes, inserted: {\(/',
+        '/(auxDataValue|partOfSpeech) = nil/',
+        '/aux(Int|String)Value\d+ = (0|nil)/',
+        '/(phrase|shortcut) = .*/',
+        '/timestamp = \d+/',
+        '/^\s*}\),?$/',
+        '/iTunes.*appBundleRef is not NULL/',
+        '/iTunes.*BUG in libdispatch client: kevent[EVFILT_WRITE] delete/',
+        '/iTunes.*AirPlayAVSys.*Stopping AirPlay/',
+        '/iTunes.*Mux ID not found in mapping dictionary/',
+        '/iTunes.*Can\'t handle disconnect with invalid ecid/',
+        '/^\s*$/', // Mavericks }
+    ),
+    'service'  => array(
+        '/Flora newsyslog.*: logfile turned over/',
+    ),
+    'direct'   => array(
+        '/^.*\s+[0-9]+ (Connect|Init DB|Query|Quit).*$/',
+        '/^s*(WHERE|AND).*$/',
+    ),
+    '500'      => array(
+        '/php.*PHP (Notice|Warning):/',
+        '/php-cgi.*PHP Parse error:/',
+    ),
+    'php-json' => array(
+        '/php-cgi.*(POST|RETURN|PROXY):/',
+    ),
+);
+
+# Main logic
+$previous = '';
+$hdlLog = fopen('php://stdin', 'r');
+while (!feof($hdlLog)) {
+    $current = fgets($hdlLog);
+    if ($previous !== $current) {
+        despatchLog(rtrim($current));
+        $previous  =  $current;
+    }
+}
+exit(0);
