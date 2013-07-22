@@ -53,7 +53,7 @@ function despatchLog($string) {
                         say("You got a bug!");
                         return;
                     case 'php-json':
-                        $strReg  = '/^(.*php-cgi.*(POST|RETURN|PROXY|HEADER|POST_BODY): )(.*)$/';
+                        $strReg  = '/^(.*php-cgi.*(POST|RETURN|PROXY|HEADER|POST_FORM|POST_BODY): )(.*)$/';
                         $strMeta = preg_replace($strReg, '$1', $string);
                         $strJson = preg_replace($strReg, '$3', $string);
                         colorize($strMeta);
@@ -279,7 +279,7 @@ $patterns = array(
         '/php-cgi.*PHP Parse error:/',
     ),
     'php-json' => array(
-        '/php-cgi.*(POST|RETURN|PROXY|HEADER|POST_BODY):/',
+        '/php-cgi.*(POST|RETURN|PROXY|HEADER|POST_FORM|POST_BODY):/',
     ),
 );
 
