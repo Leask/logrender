@@ -279,7 +279,7 @@ $patterns = array(
         '/php-cgi.*PHP Parse error:/',
     ),
     'php-json' => array(
-        '/php-cgi.*(POST|RETURN|PROXY):/',
+        '/php-cgi.*(POST|RETURN|PROXY|HEADER|POST_BODY):/',
     ),
 );
 
