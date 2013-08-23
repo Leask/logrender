@@ -57,7 +57,11 @@ function despatchLog($string) {
                         $strMeta = preg_replace($strReg, '$1', $string);
                         $strJson = preg_replace($strReg, '$3', $string);
                         colorize($strMeta);
-                        json($strJson);
+                        if (preg_match('/<xml>/', $strJson)) {
+                            colorize($strJson);
+                        } else {
+                            json($strJson);
+                        }
                         return;
                     case 'service':
                         // @todo
@@ -73,6 +77,20 @@ function despatchLog($string) {
 
 # Config
 $patterns = array(
+    'service'  => array(
+        '/Flora newsyslog.*: logfile turned over/',
+    ),
+    'direct'   => array(
+        '/^.*\s+[0-9]+ (Connect|Init DB|Query|Quit).*$/',
+        '/^s*(WHERE|AND).*$/',
+    ),
+    '500'      => array(
+        '/php.*PHP (Notice|Warning):/',
+        '/php-cgi.*PHP Parse error:/',
+    ),
+    'php-json' => array(
+        '/php-cgi.*(POST|RETURN|PROXY|HEADER|POST_FORM|POST_BODY):/',
+    ),
     'ignore'   => array(
         '/\d.*(dylib|CoreFoundation|Web|App|Kit|HIServices|HIToolbox).*0x00007fff/',
         '/\sentries =>/',
@@ -193,7 +211,7 @@ $patterns = array(
         '/>,/',
         '/<o:/',
         '/<\?xml version="1\.0" encoding="UTF-8" standalone="yes"\?>/',
-        '/>/',
+        '/^\s>$/',
         '/};/',
         '/\)}/',
         '/\);/',
@@ -252,13 +270,22 @@ $patterns = array(
         '/storeName: UserDictionary/',
         '/localPeerID: leask~/',
         '/com\.apple\.InputMethodKit\.UserDictionary.*: Core\s?Data/',
+        '/CGSCopyDisplayUUID: Invalid display/',
+        '/The domain\/default pair of (.*, KSBrandID) does not exist/',
+        '/^\s*>$/',
+        '/fp = ".*";/',
+        '/^.*defaults[\d*]:$/',
+        '/ReportCrash.*Invoking spindump for pid=.*wakeups_rate=.*duration=.*because of excessive wakeups/',
         '/NSFilePath = /',
         '/NSSQLiteErrorDomain = 19/',
         '/Managed Object Context Changes, inserted: {\(/',
         '/(auxDataValue|partOfSpeech) = nil/',
+        '/com\.apple\.time.*Interval maximum value is.*seconds (specified value:.*)\./',
         '/aux(Int|String)Value\d+ = (0|nil)/',
         '/(phrase|shortcut) = .*/',
         '/timestamp = \d+/',
+        '/kernel.*hfs: summary table not allowed on FS with block size of/',
+        '/kernel.*hfs: mounted Google Chrome.*Dev Update on device disk3s2/',
         '/^\s*}\),?$/',
         '/iTunes.*appBundleRef is not NULL/',
         '/iTunes.*BUG in libdispatch client: kevent[EVFILT_WRITE] delete/',
@@ -266,20 +293,6 @@ $patterns = array(
         '/iTunes.*Mux ID not found in mapping dictionary/',
         '/iTunes.*Can\'t handle disconnect with invalid ecid/',
         '/^\s*$/', // Mavericks }
-    ),
-    'service'  => array(
-        '/Flora newsyslog.*: logfile turned over/',
-    ),
-    'direct'   => array(
-        '/^.*\s+[0-9]+ (Connect|Init DB|Query|Quit).*$/',
-        '/^s*(WHERE|AND).*$/',
-    ),
-    '500'      => array(
-        '/php.*PHP (Notice|Warning):/',
-        '/php-cgi.*PHP Parse error:/',
-    ),
-    'php-json' => array(
-        '/php-cgi.*(POST|RETURN|PROXY|HEADER|POST_FORM|POST_BODY):/',
     ),
 );
 
