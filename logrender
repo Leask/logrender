@@ -60,7 +60,9 @@ function sqlite_fetch($sql) {
 
 function hitPattern($id) {
     return sqlite_query(
-        "UPDATE `rules` SET `hits` = `hits` + 1 WHERE `id` = {$id};"
+        "UPDATE `rules`
+         SET    `hits` = `hits` + 1, `last_matched` = datetime('now')
+         WHERE  `id`   = {$id};"
     );
 }
 
