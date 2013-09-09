@@ -294,6 +294,10 @@ $patterns = array(
         '/iTunes.*AirPlayAVSys.*Stopping AirPlay/',
         '/iTunes.*Mux ID not found in mapping dictionary/',
         '/iTunes.*Can\'t handle disconnect with invalid ecid/',
+        '/kernel.*\[BNBTrackpadDevice::init\].*init is complete/',
+        '/kernel.*\[BNBTrackpadDevice::handleStart\].*returning/',
+        '/^\s*English$/',
+        '/^\s*en$/',
         '/^\s*$/', // Mavericks }
     ),
 );
