@@ -1,0 +1,13 @@
+{
+    "name": "logrender",
+    "description": "A log render for developers by php, ONLY alpha version currently!",
+    "version": "0.0.7",
+    "private": true,
+    "homepage": "https://github.com/Leask/logrender",
+    "scripts": {
+        "start": "log"
+    },
+    "dependencies" : {
+        "tail": "*"
+    }
+}

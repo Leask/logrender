@@ -1,8 +1,48 @@
-#!/bin/sh
-# Flora Log by LeaskH.com
+#!/usr/bin/env node
+// Flora Log by @leaskh
 
-mvtab() {
-    printf "\e]1;$*\a"
+'use strict';
+
+var Tail   = require('tail').Tail,
+    exec   = require('child_process').exec,
+    config = require('./config');
+
+var log = function(logfile, string) {
+    console.log(logfile + '> ' + string);
+};
+
+var shell = function(command, callback) {
+    return exec(
+        command,
+        function(error, stdout, stderr) {
+            if (!callback) {
+                return;
+            }
+            return callback(error || stderr, stdout);
+        }
+    );
+};
+
+var colorize = function(string) {
+    return shell('echo "' + string + '"');
 }
 
-mvtab log && tail -F /var/log/system.log | logrender
+var mvtab = function(string) {
+    return shell('printf "\\e]1;' + string + '\\a"');
+};
+
+config.logfiles.forEach(function(item) {
+    var tail = new Tail(item);
+    tail.on('line', function(data) {
+        log(item, data);
+    });
+    tail.on('error', function(error) {
+        log(item, error);
+    });
+});
+
+// console.log();
+
+mvtab('sdafasdf测试', function(error) {
+    console.log(error);
+})
