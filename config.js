@@ -4,15 +4,9 @@ var config = {
     logfiles: [
         '/var/log/system.log',
         '/var/log/php.log',
-        '/var/log/accountpolicy.log',
-        '/var/log/authd.log',
-        '/var/log/cbcache.err.log',
-        '/var/log/cbcache.out.log',
         '/var/log/cloudpaird.log',
         '/var/log/commerce.log',
         '/var/log/daily.out',
-        '/var/log/displaypolicyd.log',
-        '/var/log/displaypolicyd.stdout.log',
         '/var/log/fsck_hfs.log',
         '/var/log/hdiejectd.log',
         '/var/log/install.log',
@@ -30,7 +24,6 @@ var config = {
         '/var/log/vnetlib',
         '/var/log/weekly.out',
         '/var/log/wifi.log'
-     // '/var/log/wirelessproxd.log'
     ]
 };
 
