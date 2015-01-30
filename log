@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Flora Log by @leaskh
+// logrender by @leaskh
 
 'use strict';
 
@@ -23,10 +23,6 @@ var shell = function(command, callback) {
     );
 };
 
-var colorize = function(string) {
-    return shell('echo "' + string + '"');
-}
-
 var mvtab = function(string) {
     return shell('printf "\\e]1;' + string + '\\a"');
 };
@@ -40,9 +36,3 @@ config.logfiles.forEach(function(item) {
         log(item, error);
     });
 });
-
-// console.log();
-
-mvtab('sdafasdf测试', function(error) {
-    console.log(error);
-})
