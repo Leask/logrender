@@ -10,7 +10,6 @@ var config = {
         '/var/log/cbcache.out.log',
         '/var/log/cloudpaird.log',
         '/var/log/commerce.log',
-        '/var/log/coreduetd.log',
         '/var/log/daily.out',
         '/var/log/displaypolicyd.log',
         '/var/log/displaypolicyd.stdout.log',
@@ -30,8 +29,8 @@ var config = {
         '/var/log/system.log',
         '/var/log/vnetlib',
         '/var/log/weekly.out',
-        '/var/log/wifi.log',
-        '/var/log/wirelessproxd.log'
+        '/var/log/wifi.log'
+     // '/var/log/wirelessproxd.log'
     ]
 };
 
