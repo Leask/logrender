@@ -17,7 +17,6 @@ var config = {
         '/var/log/opendirectoryd.log',
         '/var/log/org.chromium.chromoting.log',
         '/var/log/php.log',
-        '/var/log/secinitd.log',
         '/var/log/shadow.log',
         '/var/log/shutdown_monitor.log',
         '/var/log/system.log',
