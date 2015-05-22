@@ -15,7 +15,6 @@ var config = {
         '/var/log/lighttpd/error.log',
         '/var/log/monthly.out',
         '/var/log/opendirectoryd.log',
-        '/var/log/org.chromium.chromoting.log',
         '/var/log/php.log',
         '/var/log/shadow.log',
         '/var/log/shutdown_monitor.log',

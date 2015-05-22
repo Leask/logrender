@@ -5,10 +5,11 @@
 
 var Tail   = require('tail').Tail,
     exec   = require('child_process').exec,
+    colors = require('colors'),
     config = require('./config');
 
 var log = function(logfile, string) {
-    console.log(logfile + '> ' + string);
+    console.log(logfile.bgRed + ' > '.yellow + string);
 };
 
 var shell = function(command, callback) {
